@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'Dharang Sharma',
   author: 'Dharang Sharma',
   headerTitle: '',
-  description: 'A blog created with Next.js and Tailwind.css',
+  description: 'Latest blog posts, tips & tricks, tutorials and more!',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://dharangsharma.site/',

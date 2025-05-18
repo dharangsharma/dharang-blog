@@ -14,7 +14,7 @@ export default function Hero() {
           Hi, I’m Dharang Sharma
         </h1>
         <h2 className="prose text-lg text-gray-600 dark:text-gray-400">
-          {`Aaoge jab tum saajna, Angna Phool Khilenge`}
+          {`This is where I document my journey, share insights about technology, and write about things I enjoy.`}
         </h2>
       </div>
       {/* <AvatarLayout content={mainContent}>
