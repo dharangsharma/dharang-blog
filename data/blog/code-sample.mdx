@@ -1,38 +1,84 @@
 ---
-title: Sample .md file
-date: '2016-03-08'
-tags: ['markdown', 'code', 'features']
+title: Using multiple AWS accounts through the AWS CLI
+date: '2025-05-18'
+tags: ['AWS', 'Cloud']
 draft: false
-summary: Example of a markdown file with code blocks and syntax highlighting
+summary: A walkthrough to use multiple AWS accounts through the AWS CLI — one main account and two others accessed via IAM roles
 ---
 
-A sample post with markdown.
+# Introduction
 
-## Inline Highlighting
+You should use named profiles in your AWS CLI configuration `(~/.aws/config and ~/.aws/credentials)`. Here's how to set this up step by step:
 
-Sample of inline highlighting `sum = parseInt(num1) + parseInt(num2)`
+## Configure the Main Account
 
-## Code Blocks
+This account will contain your access keys.
 
-Some Javascript code
+Run:
 
-```javascript
-var num1, num2, sum
-num1 = prompt('Enter first number')
-num2 = prompt('Enter second number')
-sum = parseInt(num1) + parseInt(num2) // "+" means "add"
-alert('Sum = ' + sum) // "+" means combine into a string
+```ts:bash
+aws configure --profile main-account
 ```
 
-Some Python code 🐍
+Then enter:
 
-```python
-def fib():
-    a, b = 0, 1
-    while True:            # First iteration:
-        yield a            # yield 0 to start with and then
-        a, b = b, a + b    # a will now be 1, and b will also be 1, (0 + 1)
+- Access Key ID
+- Secret Access Key
+- Region (e.g., us-east-1)
+- Output format (e.g., json)
 
-for index, fibonacci_number in zip(range(10), fib()):
-     print('{i:3}: {f:3}'.format(i=index, f=fibonacci_number))
+This will populate `~/.aws/credentials` and `~/.aws/config` like:
+
+```ts:~/.aws/credentials
+[main-account]
+aws_access_key_id = YOUR_MAIN_ACCESS_KEY
+aws_secret_access_key = YOUR_MAIN_SECRET_KEY
+```
+
+```ts:~/.aws/config
+[profile main-account]
+region = us-east-1
+output = json
+```
+
+## Add Role-Based Accounts
+
+Assuming the main account lets you assume a role in the two other accounts.
+
+### Example:
+
+- Role name in other account: OrganizationAccountAccessRole
+- Account IDs: 111111111111, 222222222222
+
+Add the following to your `~/.aws/config` file
+
+```ts:~/.aws/config
+[profile account-one]
+role_arn = arn:aws:iam::111111111111:role/OrganizationAccountAccessRole
+source_profile = main-account
+region = us-east-1
+
+[profile account-two]
+role_arn = arn:aws:iam::222222222222:role/OrganizationAccountAccessRole
+source_profile = main-account
+region = us-east-1
+```
+
+✅ source_profile tells the CLI to use the credentials from main-account to assume the role.
+
+## Using the Profiles
+
+Now you can use any of the accounts like this:
+
+```ts:bash
+aws s3 ls --profile main-account
+aws s3 ls --profile account-one
+aws s3 ls --profile account-two
+```
+
+Or you can set the profile temporarily for your session:
+
+```ts:bash
+export AWS_PROFILE=account-one
+aws s3 ls
 ```
