@@ -1,0 +1,55 @@
+---
+title: How to merge Kubernetes Kubectl config files
+date: '2025-05-25'
+tags: ['EKS', 'Kubernetes', 'DevOps']
+draft: false
+summary: Since a DevOps engineer needs to manage multiple kubernetes clusters, here is a quick walkthrough to merge Kubernetes Kubectl config files thus allowing us to keep only one Kubectl config file in ~/.kube/config file.
+---
+
+# Introduction
+
+Since a DevOps engineer needs to manage multiple kubernetes clusters, here is a quick walkthrough to merge Kubernetes Kubectl config files thus allowing us to keep only one Kubectl config file in `(~/.kube/config)`. Here's how to set this up step by step:
+
+## Make a copy of your existing config
+
+```ts:bash
+cp ~/.kube/config ~/.kube/config.bak
+```
+
+## Merge the two config files together into a new config file
+
+```ts:bash
+KUBECONFIG=~/.kube/config:/path/to/new/config
+
+kubectl config view --flatten > /tmp/config
+```
+
+This tells kubectl to use both config files `(~/.kube/config and /path/to/new/config)` together they are merged virtually for the following command.
+
+This does the following:
+
+- **kubectl config view:** Displays the merged configuration from all the files listed in KUBECONFIG.
+- **--flatten:** Ensures that all referenced files (like user auth info or clusters that may point to separate files) are flattened into a single self-contained config file.
+- **/tmp/config:** Redirects the output into a new standalone kubeconfig file.
+
+You now have a new file at /tmp/config that:
+
+- Includes all contexts, users, and clusters from both original kubeconfig files.
+- Is self-contained (no external references).
+- Can be used as a unified kubeconfig by itself.
+
+## Replace your old config with the new merged config
+
+```ts:bash
+mv /tmp/config ~/.kube/config
+```
+
+This command moves the merged kubeconfig you created earlier from /tmp/config to your default kubeconfig location `~/.kube/config`, effectively replacing your existing kubeconf
+
+## After Running
+
+You can verify everything worked by running:
+
+```ts:bash
+kubectl config get-contexts
+```
