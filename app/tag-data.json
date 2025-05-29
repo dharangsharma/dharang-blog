@@ -1,4 +1,7 @@
 {
+  "eks": 1,
+  "kubernetes": 1,
+  "devops": 1,
   "aws": 3,
   "cloud": 1,
   "next-js": 6,
